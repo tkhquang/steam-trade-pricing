@@ -1,0 +1,34 @@
+@mixin alterScrollbars($size, $moz-size, $foreground-color, $background-color) {
+  &::-webkit-scrollbar {
+    width: $size;
+    height: $size;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $foreground-color;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: mix($foreground-color, #000, 80%);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $background-color;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: $background-color;
+  }
+  /* Firefox */
+  scrollbar-color: $foreground-color $background-color;
+  scrollbar-width: $moz-size; /* thin auto none */
+}
+
+@mixin scrollbars($selector, $size, $moz-size, $foreground-color, $background-color) {
+  #{$selector} {
+    &::before, &::after {
+      @include alterScrollbars($size, $moz-size, $foreground-color, $background-color)
+    }
+    @include alterScrollbars($size, $moz-size, $foreground-color, $background-color)
+  }
+}
