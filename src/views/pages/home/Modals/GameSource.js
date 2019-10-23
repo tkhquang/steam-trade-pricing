@@ -1,14 +1,18 @@
 import React from "react";
-import Popup from "reactjs-popup";
+import { useDispatch } from "react-redux";
 
-const ModalSource = ({ updateSelectedItem, itemListing }) => {
+import Popup from "reactjs-popup";
+import { g2aOperations } from "state/ducks/g2a";
+
+const ModalSource = ({ listings, id }) => {
+  const dispatch = useDispatch();
   return (
     <Popup
       trigger={
         <button
           type="button"
           className="text-blue-700 underline cursor-pointer disabled:cursor-not-allowed disabled:text-gray-500 disabled:no-underline disabled:opacity-50"
-          disabled={!itemListing || !itemListing.length}
+          disabled={!listings || !listings.length}
         >
           Source
         </button>
@@ -22,7 +26,7 @@ const ModalSource = ({ updateSelectedItem, itemListing }) => {
           </button>
           <div className="header"> Available Sources </div>
           <div className="content">
-            {itemListing.length && (
+            {listings.length && (
               <table className="mx-auto">
                 <thead>
                   <tr>
@@ -31,13 +35,15 @@ const ModalSource = ({ updateSelectedItem, itemListing }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {itemListing.map(source => (
+                  {listings.map(source => (
                     <tr
                       key={source.id}
                       className="cursor-pointer"
                       title="Use this source"
                       onClick={() => {
-                        updateSelectedItem(source.id);
+                        dispatch(
+                          g2aOperations.fetchSelectedAuction(id, source.id)
+                        );
                         close();
                       }}
                     >

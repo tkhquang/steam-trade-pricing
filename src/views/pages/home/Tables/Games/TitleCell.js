@@ -1,28 +1,26 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 
 import EdiText from "react-editext";
 import classNames from "classnames";
 
-import "./ItemTitle.scss";
-import ModalSource from "./ModalSource";
+import GameSource from "views/pages/home/Modals/GameSource";
+import { g2aOperations } from "state/ducks/g2a";
+import { g2aHelper } from "views/enhancers";
 
-const ItemTitle = ({
+import "./TitleCell.scss";
+
+const TitleCell = ({
+  game,
+  status,
+  open,
   title,
-  selectedItem,
-  itemListing,
-  updateSelectedItem,
-  updateSearchKey,
-  isFetching,
-  searchKey
+  length,
+  listings,
+  auction
 }) => {
-  const [status, changeStatus] = useState(false);
   const [editing, changeEditMode] = useState(false);
-
-  const toggleExpand = () => {
-    changeStatus(prevState => {
-      return !prevState;
-    });
-  };
+  const dispatch = useDispatch();
 
   const toggleEditing = () => {
     changeEditMode(prevState => {
@@ -31,46 +29,47 @@ const ItemTitle = ({
   };
 
   const onSave = val => {
-    if (val === searchKey) {
+    toggleEditing();
+    if (val === game.search) {
       return;
     }
-    if (selectedItem && selectedItem.name === val) {
+    if (title === val) {
       return;
     }
-    updateSearchKey(searchKey, val);
+    dispatch(
+      g2aOperations.fetchUpdatedGameItem(g2aHelper.genGameItem(game.id, val))
+    );
   };
+
+  const toggleExpand = () => {
+    dispatch(g2aOperations.toggleExpand(game.id));
+  };
+
   return (
     <th>
       <table className="border-none">
         <tbody>
           <tr className="">
             <td className="border-none block text-center w-6">
-              {!isFetching ? (
+              {status ? (
                 <span className="cursor-pointer" onClick={toggleExpand}>
-                  {status ? "▼" : "►"}
+                  {open ? "▼" : "►"}
                 </span>
               ) : (
                 <span>&nbsp;</span>
               )}
             </td>
-            <td
-              className="border-none relative w-full h-full"
-              title={
-                !selectedItem
-                  ? title
-                  : `${selectedItem.name} (${itemListing.length})`
-              }
-            >
+            <td className="border-none relative w-full h-full" title={title}>
               {
                 <EdiText
                   type="text"
-                  value={!selectedItem ? title : selectedItem.name}
+                  value={title}
                   onSave={onSave}
                   onCancel={toggleEditing}
                   editing={editing}
                   viewProps={{
                     className: classNames({
-                      "absolute inset-0 p-2 truncate": !status
+                      "absolute inset-0 p-2 truncate": !open
                     })
                   }}
                   editButtonClassName="invisible"
@@ -78,24 +77,17 @@ const ItemTitle = ({
               }
             </td>
             <td className="border-none">
-              {selectedItem ? (
-                <span>{`(${itemListing.length})`}</span>
-              ) : (
-                <span>&nbsp;</span>
-              )}
+              {length ? <span>{`(${length})`}</span> : <span>&nbsp;</span>}
             </td>
           </tr>
           <tr
             className={classNames({
-              hidden: !status
+              hidden: !open
             })}
           >
             <td className="border-none text-center"></td>
             <td className="border-none">
-              <ModalSource
-                updateSelectedItem={updateSelectedItem}
-                itemListing={itemListing}
-              />
+              <GameSource listings={listings} id={game.id} />
               <button
                 type="button"
                 className="text-blue-700 underline cursor-pointer px-2"
@@ -104,17 +96,15 @@ const ItemTitle = ({
                 {editing ? "Cancel" : "Edit"}
               </button>
             </td>
-            <td className="border-none block text-center w-6">
-              {selectedItem ? (
+            <td className="border-none text-center w-6">
+              {length ? (
                 <a
-                  href={`https://www.g2a.com${
-                    selectedItem ? selectedItem.slug : ""
-                  }`}
+                  href={`https://www.g2a.com${length ? auction.slug : ""}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className=""
                 >
-                  🔗
+                  <span>🔗</span>
                 </a>
               ) : (
                 <span>&nbsp;</span>
@@ -125,15 +115,5 @@ const ItemTitle = ({
       </table>
     </th>
   );
-}; /* <EdiText
-  type="text"
-  saveButtonContent="Apply"
-  cancelButtonContent="Cancel"
-  saveButtonClassName="custom-save-button"
-  editButtonClassName="custom-edit-button"
-  cancelButtonClassName="custom-cancel-button"
-  editButtonContent="Edit"
-  value={!selectedItem ? title : `${selectedItem.name}`}
-  onSave={onSave}
-/> */
-export default ItemTitle;
+};
+export default TitleCell;

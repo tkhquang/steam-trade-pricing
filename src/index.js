@@ -1,12 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { store } from "./store";
+import configureStore from "state/store";
 import { Provider } from "react-redux";
 
-import App from "./App";
+import App from "views/pages/App";
 
-import "./styles/index.css";
-import "./styles/main.scss";
+const initialState = {
+  steam: {
+    prices: {
+      status: {
+        loading: true
+      },
+      data: {}
+    }
+  },
+  g2a: {
+    entries: {
+      data: {},
+      status: {
+        loading: false
+      }
+    }
+  }
+};
+
+const store = configureStore(initialState);
+
+// run Saga
+store.runSaga();
 
 ReactDOM.render(
   <Provider store={store}>
