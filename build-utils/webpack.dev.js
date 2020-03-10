@@ -7,6 +7,7 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new Dotenv({
+      systemvars: true,
       path: "./.env.development"
     })
   ],
