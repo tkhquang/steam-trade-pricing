@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { g2aSelectors } from "state/ducks/g2a";
+import { g2aSelectors } from "@state/ducks/g2a";
 // import { steamSelectors } from "state/ducks/steam";
 
 import Row from "./Row";
@@ -8,34 +8,34 @@ import Row from "./Row";
 const Games = () => {
   const entryArr = useSelector(g2aSelectors.entryArr);
   // const entryObj = useSelector(g2aSelectors.entryObj);
-  const entryStatus = useSelector(g2aSelectors.entryStatus);
+  // const entryStatus = useSelector(g2aSelectors.entryStatus);
   // const steamPrices = useSelector(steamSelectors.data);
 
-  const mappedData = {
-    data: entryArr.map(entry => {
-      return {
-        entry: {
-          id: entry.id,
-          title: entry.title,
-          search: entry.search,
-          status: entryStatus,
-          total: entry.total | 0,
-          message: entry.message | ""
-        },
-        auctionList: {
-          status: entry.status,
-          data: !entry.status.loading ? [...entry.listings] : []
-        },
-        auction: {
-          status: entry.auction ? entry.auction.status : { loading: true },
-          data: { ...entry.auction }
-        }
-        // prices, // g2a, gems, csgo, tf2
-      };
-    })
-  };
+  // const mappedData = {
+  //   data: entryArr.map(entry => {
+  //     return {
+  //       entry: {
+  //         id: entry.id,
+  //         title: entry.title,
+  //         search: entry.search,
+  //         status: entryStatus,
+  //         total: entry.total | 0,
+  //         message: entry.message | ""
+  //       },
+  //       auctionList: {
+  //         status: entry.status,
+  //         data: !entry.status.loading ? [...entry.listings] : []
+  //       },
+  //       auction: {
+  //         status: entry.auction ? entry.auction.status : { loading: true },
+  //         data: { ...entry.auction }
+  //       }
+  //       // prices, // g2a, gems, csgo, tf2
+  //     };
+  //   })
+  // };
 
-  console.log({ mappedData });
+  // console.log({ mappedData });
 
   // const newArr = [...entryArr].sort((a, b) => {
   //   const { name: keyA = "" } = a.auction || { name: "" };
@@ -66,8 +66,8 @@ const Games = () => {
             </tr>
           </thead>
           <tbody>
-            {entryArr.map(game => (
-              <Row game={game} key={game.id} />
+            {entryArr.map(entry => (
+              <Row entry={entry} key={entry.id} />
             ))}
           </tbody>
         </table>

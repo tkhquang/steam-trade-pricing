@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import Popup from "reactjs-popup";
 import { g2aOperations } from "state/ducks/g2a";
 
-const ModalSource = ({ listings, id }) => {
+const ModalSource = ({ auctions, entryId }) => {
   const dispatch = useDispatch();
   return (
     <Popup
@@ -12,7 +12,7 @@ const ModalSource = ({ listings, id }) => {
         <button
           type="button"
           className="text-blue-700 underline cursor-pointer disabled:cursor-not-allowed disabled:text-gray-500 disabled:no-underline disabled:opacity-50"
-          disabled={!listings || !listings.length}
+          disabled={!Object.keys(auctions).length}
         >
           Source
         </button>
@@ -26,7 +26,7 @@ const ModalSource = ({ listings, id }) => {
           </button>
           <div className="header"> Available Sources </div>
           <div className="content">
-            {listings.length && (
+            {Object.keys(auctions).length && (
               <table className="mx-auto">
                 <thead>
                   <tr>
@@ -35,14 +35,17 @@ const ModalSource = ({ listings, id }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {listings.map(source => (
+                  {Object.values(auctions).map(source => (
                     <tr
                       key={source.id}
                       className="cursor-pointer"
                       title="Use this source"
                       onClick={() => {
                         dispatch(
-                          g2aOperations.fetchSelectedAuction(id, source.id)
+                          g2aOperations.fetchSelectedAuction({
+                            entryId,
+                            id: source.id
+                          })
                         );
                         close();
                       }}
@@ -55,17 +58,16 @@ const ModalSource = ({ listings, id }) => {
               </table>
             )}
           </div>
-          <div className="actions">
+          {/* <div className="actions">
             <button
               className="button"
               onClick={() => {
-                console.log("modal closed ");
                 close();
               }}
             >
-              close modal
+              Close modal
             </button>
-          </div>
+          </div> */}
         </div>
       )}
     </Popup>

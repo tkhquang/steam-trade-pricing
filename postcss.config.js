@@ -1,40 +1,35 @@
 const tailwindcss = require("tailwindcss");
 const glob = require("glob-all");
-const purgecss = require("@fullhuman/postcss-purgecss");
 const autoprefixer = require("autoprefixer");
 const postcssImport = require("postcss-import");
 
-class TailwindExtractor {
-  static extract(content) {
-    return content.match(/[\w-/:]+(?<!:)/g) || [];
-  }
-}
+const purgecss = require("@fullhuman/postcss-purgecss")({
+  content: ["src/index.html", "src/**/*.js"],
+  css: ["src/styles/*.css"],
+  extractors: [
+    {
+      extractor: class TailwindExtractor {
+        static extract(content) {
+          return content.match(/[\w-/:]+(?<!:)/g) || [];
+        }
+      },
+      extensions: ["css", "html", "js"]
+    }
+  ],
+  whitelist: ["html", "body"]
+});
 
-module.exports = {
-  // Specify the locations of any files you want to scan for class names.
-  paths: glob.sync(["src/**/*.js"]),
-  syntax: "postcss-scss",
-  parser: "postcss-scss",
-  plugins: [
-    postcssImport,
-    tailwindcss("./tailwind.config.js"),
-    ...(process.env.NODE_ENV === "production"
-      ? [
-          purgecss({
-            content: ["./src/**/*.js"],
-            css: ["./src/**/*.css"],
-            extractors: [
-              {
-                extractor: TailwindExtractor,
-                extensions: [
-                  "js", //
-                  "css"
-                ]
-              }
-            ]
-          })
-        ]
-      : []),
-    autoprefixer
-  ]
+module.exports = ctx => {
+  return {
+    // Specify the locations of any files you want to scan for class names.
+    paths: glob.sync(["src/**/*.js"]),
+    syntax: "postcss-scss",
+    parser: "postcss-scss",
+    plugins: [
+      postcssImport,
+      tailwindcss("./tailwind.config.js"),
+      autoprefixer,
+      ...(ctx.webpack.mode === "production" ? [purgecss] : [])
+    ]
+  };
 };

@@ -1,5 +1,7 @@
 import { all, put, call, takeLatest } from "redux-saga/effects";
-import { types, actions, g2aServices } from "state/ducks/g2a";
+
+import { types, actions, g2aServices } from "@state/ducks/g2a";
+import { errHandler } from "@utils";
 
 export function* watchGetListings() {
   yield takeLatest(types.ACTION_FETCH_LISTINGS, getListings);
@@ -18,6 +20,7 @@ function* getListings(args) {
     yield all(promises);
     yield put(actions.fetchListingsCompleted());
   } catch (error) {
+    console.error(errHandler(error));
     yield put(actions.fetchListingsFailed(error));
   }
 }
@@ -29,45 +32,66 @@ function* getUpdatedListing(args) {
     yield put(actions.updateGameItem(payload));
     yield call(getAuctionList, payload);
   } catch (error) {
-    console.log(error);
+    console.error(errHandler(error));
   }
 }
 
 // 'id', 'search' are required
 function* getAuctionList(args) {
-  const { id, search } = args;
-  yield put(actions.fetchAuctionListStarted(id));
+  const { id: entryId, search } = args;
+  yield put(actions.fetchAuctionListStarted(entryId));
+
   try {
-    const config = {
-      params: {
-        search
-      }
+    const { total, auctions, message } = yield call(
+      g2aServices.getList,
+      search
+    );
+
+    Object.keys(auctions).forEach(id => {
+      auctions[id] = {
+        ...auctions[id],
+        entryId
+      };
+    });
+
+    const data = {
+      total,
+      auctions,
+      message
     };
-    const data = yield call(g2aServices.getList, config);
-    yield put(actions.fetchAuctionListCompleted(id, data));
-    if (!data.listings.length) {
-      yield put(actions.fetchAuctionCompleted(id));
+
+    yield put(actions.fetchAuctionListCompleted({ ...data, entryId }));
+
+    if (!Object.values(data.auctions).length) {
+      yield put(actions.fetchAuctionCompleted({ entryId }));
     } else {
-      yield call(getAuction, { ...args, auctionId: data.listings[0].id });
+      const payload = {
+        entryId,
+        id: Object.values(data.auctions)[0].id
+      };
+      yield call(getAuction, { payload });
     }
   } catch (error) {
-    yield put(actions.fetchAuctionListFailed(error));
+    console.error(errHandler(error));
+    yield put(actions.fetchAuctionListFailed({ entryId, error }));
   }
 }
 
-// 'id', 'auctionId' are required
+// 'entryId', 'id' are required
 function* getAuction(args) {
-  const { auctionId, id } = args;
-  yield put(actions.fetchAuctionStarted(id));
+  const { payload } = args;
+  const { id: auctionId, entryId } = payload;
+  yield put(actions.fetchAuctionStarted(entryId));
   try {
-    const config = {
-      params: {
-        id: auctionId
-      }
+    const data = yield call(g2aServices.getAuction, auctionId);
+    const payload = {
+      id: auctionId,
+      entryId,
+      lowest_price: data.lowest_price
     };
-    const data = yield call(g2aServices.getAuction, config);
-    yield put(actions.fetchAuctionCompleted(id, { ...data, id: auctionId }));
+    yield put(actions.fetchAuctionCompleted(payload));
   } catch (error) {
-    yield put(actions.fetchAuctionFailed(error));
+    console.error(errHandler(error));
+    yield put(actions.fetchAuctionFailed({ entryId, error }));
   }
 }

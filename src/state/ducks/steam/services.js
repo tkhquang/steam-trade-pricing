@@ -1,13 +1,14 @@
-import { request } from "state/utils";
+import { request } from "@utils";
 
-export const getPrices = async () => {
+export const getPrices = async (...opts) => {
   try {
     const { data } = await request({
       url: "/steam/prices",
-      method: "GET"
+      method: "GET",
+      ...opts
     });
     return data;
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error);
   }
 };

@@ -3,28 +3,27 @@ import { useSelector } from "react-redux";
 
 import TitleCell from "./TitleCell";
 import PriceCell from "./PriceCell";
+import { g2aSelectors } from "@state/ducks/g2a";
 
-const Row = ({ game }) => {
-  const gameData = useSelector(state => state.g2a.entries.data[game.id]);
+const Row = ({ entry }) => {
+  const { [entry.id]: entryData } = useSelector(g2aSelectors.entryObj);
 
-  const { status, listings = [], auction = {} } = gameData;
+  const { open, auctions, meta, details } = entryData;
 
-  const { open } = status;
-
-  const { name: gameTitle = game.title } = auction;
+  const { name: gameTitle = entryData.title } = meta;
 
   return (
     <tr>
       <TitleCell
-        status={status && auction.status}
-        game={game}
+        status={meta.status.loading}
+        entry={entry}
         open={open}
         title={gameTitle}
-        length={listings.length}
-        listings={listings}
-        auction={auction}
+        length={Object.keys(auctions).length}
+        auctions={auctions}
+        details={details}
       />
-      <PriceCell game={game} />
+      <PriceCell status={details.status.loading} entry={entry} />
     </tr>
   );
 };

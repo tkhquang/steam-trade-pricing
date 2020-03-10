@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { g2aHelper } from "views/enhancers";
-import { g2aOperations } from "state/ducks/g2a";
+
+import { g2aOperations, g2aSelectors } from "@state/ducks/g2a";
+import { g2aHelper } from "@views/enhancers";
 
 const placeholderText = `Input your game titles here...
 
@@ -15,7 +16,7 @@ Sid Meier's Civilization VI
 const Input = () => {
   const inputRef = useRef();
   const dispatch = useDispatch();
-  const isFetching = useSelector(state => state.g2a.entries.status.loading);
+  const { loading } = useSelector(g2aSelectors.entryStatus);
 
   const getPrices = e => {
     e.preventDefault();
@@ -24,8 +25,8 @@ const Input = () => {
       .split(/[\r\n]+/)
       .map(item => item.trim())
       .filter(i => Boolean(i));
-    const items = g2aHelper.genGameListObj(inputValue);
-    dispatch(g2aOperations.fetchListings(items));
+    const entries = g2aHelper.genGameListObj(inputValue);
+    dispatch(g2aOperations.fetchListings(entries));
   };
 
   return (
@@ -39,10 +40,10 @@ const Input = () => {
         />
         <button
           type="submit"
-          disabled={isFetching}
+          disabled={loading}
           className="w-full mt-2 inline-block bg-teal-700 hover:bg-teal-500 text-white font-bold py-2 px-4 border border-teal-500 rounded disabled:cursor-not-allowed disabled:bg-gray-700"
         >
-          {isFetching ? "Loading..." : "Submit"}
+          {loading ? "Loading..." : "Submit"}
         </button>
       </form>
     </div>

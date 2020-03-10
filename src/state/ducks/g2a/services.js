@@ -1,31 +1,46 @@
-import { request } from "state/utils";
+import { request } from "@utils";
 
-// 'search' required
+// 'search' query required
 // Fetch all the listing auctions based on search key
-export const getList = async opts => {
+export const getList = async (search, opts = {}) => {
   try {
     const { data } = await request({
-      url: "/g2a/listings",
+      url: "/g2a/auctions",
       method: "GET",
+      params: {
+        search
+      },
       ...opts
     });
-    return data;
+    const { total, auctions, message } = data;
+    let obj = {};
+    auctions.forEach(auction => {
+      obj = {
+        ...obj,
+        [auction.id]: auction
+      };
+    });
+    return {
+      total,
+      auctions: obj,
+      message
+    };
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error);
   }
 };
 
-// 'id' required
+// 'id' params required
 // Fetch the auction which based on the given id
-export const getAuction = async opts => {
+export const getAuction = async (id, opts = {}) => {
   try {
     const { data } = await request({
-      url: "/g2a/auction",
+      url: `/g2a/auctions/${id}`,
       method: "GET",
       ...opts
     });
     return data;
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error);
   }
 };

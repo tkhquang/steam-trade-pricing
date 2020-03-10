@@ -13,7 +13,7 @@ export const fetchPricesCompleted = payload => ({
   payload
 });
 
-export const fetchPricesFailed = error => ({
+export const fetchPricesFailed = payload => ({
   type: types.FETCH_PRICES_FAILED,
-  error
+  payload
 });

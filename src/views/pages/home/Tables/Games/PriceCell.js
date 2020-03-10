@@ -1,19 +1,18 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import Loader from "components/Loader";
-import { steamHelper } from "views/enhancers";
-import { steamSelectors } from "state/ducks/steam";
+import Loader from "@views/common/Loader";
+import { steamHelper } from "@views/enhancers";
+import { steamSelectors } from "@state/ducks/steam";
+import { g2aSelectors } from "@state/ducks/g2a";
 
-const PriceCell = ({ game }) => {
-  const gameData = useSelector(state => state.g2a.entries.data[game.id]);
+const PriceCell = ({ entry, status }) => {
+  const { [entry.id]: entryData } = useSelector(g2aSelectors.entryObj);
   const steamPrices = useSelector(steamSelectors.data);
 
-  const { status, listings = [], auction = {} } = gameData;
+  const { meta, details } = entryData;
 
-  const isNoResult = !listings.length;
-
-  const { lowest_price: gamePrice = null } = auction;
+  const { lowest_price: gamePrice = null } = details.data || {};
 
   const roundPrice = (price, dex) => {
     return Number(Math.round(`${price}e+${dex}`) + `e-${dex}`);
@@ -25,10 +24,10 @@ const PriceCell = ({ game }) => {
     csgo: roundPrice(+gamePrice / steamHelper.csgoKeyPrice(steamPrices), 2)
   };
 
-  return status && auction.status ? (
-    isNoResult ? (
+  return !status ? (
+    !details?.data?.lowest_price ? (
       <td colSpan="4" className="text-center">
-        <span>❌ {gameData.message}</span>
+        <span>❌ {meta?.data?.message}</span>
       </td>
     ) : (
       <>

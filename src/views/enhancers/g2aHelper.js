@@ -1,30 +1,39 @@
-import UUID from "uuid/v4";
-import { stripPattern } from "constants/g2a";
+import { defaultSettings } from "@constants";
+import { helpers } from "@utils";
 
 class G2aHelperService {
   constructor() {
     this.strip = string => {
-      return string.toLowerCase().replace(stripPattern, "");
+      return string.toLowerCase().replace(defaultSettings.stripPattern, "");
     };
   }
 
-  genGameItem(id, title) {
+  genGameItem(title) {
     return {
-      id,
       title,
       search: this.strip(title),
-      open: false
+      open: false,
+      meta: {
+        data: {},
+        status: {
+          loading: true,
+          error: null
+        }
+      },
+      auctions: {},
+      details: {
+        data: {},
+        status: {
+          loading: true,
+          error: null
+        }
+      }
     };
   }
 
   // Generate Game List Object
   genGameListObj(titles) {
-    let obj = {};
-    titles.forEach(title => {
-      const id = UUID();
-      obj = { ...obj, [id]: this.genGameItem(id, title) };
-    });
-    return obj;
+    return helpers.toObj(titles.map(title => this.genGameItem(title)));
   }
 }
 

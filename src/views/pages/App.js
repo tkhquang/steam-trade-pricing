@@ -1,9 +1,10 @@
 import React, { useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { steamOperations, steamSelectors } from "state/ducks/steam";
 
-import Loader from "views/common/Loader";
-import Main from "views/pages/Main";
+import { steamOperations, steamSelectors } from "@state/ducks/steam";
+
+import Loader from "@views/common/Loader";
+import Main from "@views/pages/Main";
 
 import "styles/index.css";
 
@@ -23,7 +24,7 @@ const App = () => {
     <div className="pb-10">
       {!steamStatus.loading ? (
         steamStatus.error ? (
-          "Error"
+          steamStatus.error.message
         ) : (
           <Main />
         )

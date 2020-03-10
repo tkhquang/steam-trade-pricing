@@ -1,90 +1,95 @@
 import { combineReducers } from "redux";
-import { createReducer, errHandler } from "state/utils";
+import { createReducer, createStatusReducer } from "@state/utils";
 
 import * as types from "./types";
 
-const statusReducer = createReducer(false)({
-  [types.FETCH_LISTINGS_STARTED]: _ => {
-    return { loading: true };
-  },
-  [types.FETCH_LISTINGS_FAILED]: (_, action) => {
-    const { error } = action;
-    return { loading: false, error: errHandler(error) };
-  },
-  [types.FETCH_LISTINGS_COMPLETED]: _ => {
-    return { loading: false };
-  }
-});
+const statusReducer = createStatusReducer({ loading: false })(
+  types.FETCH_LISTINGS_STARTED,
+  types.FETCH_LISTINGS_FAILED,
+  types.FETCH_LISTINGS_COMPLETED
+);
 
-const dataReducers = createReducer(null)({
-  [types.STORE_GAME_LIST]: (_, action) => {
-    return { ...action.payload };
+const dataReducers = createReducer({})({
+  [types.STORE_GAME_LIST]: (state, action) => {
+    return {
+      ...action.payload
+    };
   },
   [types.STORE_UPDATED_GAME_ITEM]: (state, action) => {
-    const { payload } = action;
+    const { id: entryId } = action.payload;
 
     const newState = {
       ...state,
-      [payload.id]: {
-        ...payload
+      [entryId]: {
+        ...action.payload
       }
     };
 
     return newState;
   },
   [types.FETCH_AUCTION_LIST_STARTED]: (state, action) => {
-    const { id } = action;
+    const entryId = action.payload;
     const newState = {
       ...state,
-      [id]: {
-        ...state[id],
-        status: {
-          loading: true
+      [entryId]: {
+        ...state[entryId],
+        meta: {
+          data: {},
+          status: {
+            loading: true,
+            error: null
+          }
         }
       }
     };
     return newState;
   },
   [types.FETCH_AUCTION_LIST_FAILED]: (state, action) => {
-    const { id, error } = action;
+    const { entryId, error } = action.payload;
     const newState = {
       ...state,
-      [id]: {
-        ...state[id],
-        status: {
-          loading: false,
-          error: errHandler(error)
+      [entryId]: {
+        ...state[entryId],
+        meta: {
+          data: {},
+          status: {
+            loading: false,
+            error
+          }
         }
       }
     };
     return newState;
   },
   [types.FETCH_AUCTION_LIST_COMPLETED]: (state, action) => {
-    const { id, payload } = action;
+    const { entryId, auctions, message, total } = action.payload;
     const newState = {
       ...state,
-      [id]: {
-        ...state[id],
-        listings: payload.listings,
-        total: payload.numFound,
-        message: payload.message,
-        status: {
-          loading: false
+      [entryId]: {
+        ...state[entryId],
+        auctions,
+        meta: {
+          data: { total, message },
+          status: {
+            loading: false,
+            error: null
+          }
         }
       }
     };
     return newState;
   },
   [types.FETCH_AUCTION_STARTED]: (state, action) => {
-    const { id } = action;
+    const entryId = action.payload;
 
     const newState = {
       ...state,
-      [id]: {
-        ...state[id],
-        auction: {
+      [entryId]: {
+        ...state[entryId],
+        details: {
           status: {
-            loading: true
+            loading: true,
+            error: null
           }
         }
       }
@@ -93,16 +98,16 @@ const dataReducers = createReducer(null)({
     return newState;
   },
   [types.FETCH_AUCTION_FAILED]: (state, action) => {
-    const { id, error } = action;
+    const { entryId, error } = action.payload;
 
     const newState = {
       ...state,
-      [id]: {
-        ...state[id],
-        auction: {
+      [entryId]: {
+        ...state[entryId],
+        details: {
           status: {
             loading: false,
-            error: errHandler(error)
+            error
           }
         }
       }
@@ -111,20 +116,40 @@ const dataReducers = createReducer(null)({
     return newState;
   },
   [types.FETCH_AUCTION_COMPLETED]: (state, action) => {
-    const { id, payload } = action;
-    const { listings } = state[id];
+    const { id, entryId, lowest_price } = action.payload;
+    const { auctions } = state[entryId];
 
-    const { name, slug } = listings.find(listing => listing.id === payload.id);
+    if (!id) {
+      return {
+        ...state,
+        [entryId]: {
+          ...state[entryId],
+          details: {
+            data: {},
+            status: {
+              loading: false,
+              error: null
+            }
+          }
+        }
+      };
+    }
+
+    const { name, slug } = auctions[id];
     const newState = {
       ...state,
-      [id]: {
-        ...state[id],
-        auction: {
-          ...payload,
-          name,
-          slug,
+      [entryId]: {
+        ...state[entryId],
+        details: {
+          data: {
+            id,
+            name,
+            slug,
+            lowest_price
+          },
           status: {
-            loading: false
+            loading: false,
+            error: null
           }
         }
       }
@@ -133,26 +158,26 @@ const dataReducers = createReducer(null)({
     return newState;
   },
   [types.ACTION_TOGGLE_EXPAND]: (state, action) => {
-    const { id } = action;
-    const { open } = state[id].status;
+    const entryId = action.payload;
+    const { open } = state[entryId];
 
     const newState = {
       ...state,
-      [id]: {
-        ...state[id],
-        status: {
-          ...state[id].status,
-          open: !open
-        }
+      [entryId]: {
+        ...state[entryId],
+        open: !open
       }
     };
     return newState;
   }
 });
 
+const settingReducer = createReducer({})({});
+
 export default combineReducers({
   entries: combineReducers({
     data: dataReducers,
     status: statusReducer
-  })
+  }),
+  settings: settingReducer
 });

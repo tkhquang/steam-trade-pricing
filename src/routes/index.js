@@ -1,4 +1,4 @@
-import { Home } from "views/pages";
+import { Home } from "@views/pages";
 // import { withAuthentication, lazyLoad } from "views/enhancers";
 
 const routes = [

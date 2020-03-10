@@ -1,33 +1,9 @@
 @import "tailwindcss/base";
+/* any of my own custom base styles go here */
+@import "./custom_base.css";
 
 @import "tailwindcss/components";
+/* any of my own custom component styles go here */
 
 @import "tailwindcss/utilities";
-
-html, body {
-  @apply m-0 p-0;
-}
-
-html {
-  @apply text-gray-200 bg-gray-900;
-}
-
-table {
-  @apply table-fixed border-collapse;
-}
-
-table, th, td {
-  @apply border border-teal-700 text-left;
-}
-
-th, td {
-  @apply p-2;
-}
-
-h2 {
-  @apply text-2xl font-bold my-4;
-}
-
-textarea, input {
-  @apply bg-teal-900;
-}
+/* any of my own custom utilities go here */
