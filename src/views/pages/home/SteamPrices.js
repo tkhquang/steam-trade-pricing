@@ -49,6 +49,14 @@ const SteamPrices = () => {
                 {Math.ceil(tf2Key / (gems / 1000))} <span>💎</span>
               </td>
             </tr>
+            <tr>
+              <td>Phd</td>
+              <td>Phd</td>
+            </tr>
+            <tr>
+              <td>Phd</td>
+              <td>Phd</td>
+            </tr>
           </tbody>
         </table>
       </div>

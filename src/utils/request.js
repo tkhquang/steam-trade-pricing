@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as rax from "retry-axios";
 
 const Axios = axios.create({
   baseURL: `${process.env.API}`,
@@ -8,6 +9,12 @@ const Axios = axios.create({
     Accept: "application/json"
   }
 });
+
+Axios.defaults.raxConfig = {
+  instance: Axios
+};
+
+rax.attach(Axios);
 
 const request = async opts => {
   try {

@@ -21,10 +21,12 @@ const App = () => {
   }, [getSteamPrices]);
 
   return (
-    <div className="pb-10">
+    <div className="min-h-screen">
       {!steamStatus.loading ? (
         steamStatus.error ? (
-          steamStatus.error.message
+          <div className="flex min-h-screen w-full items-center justify-center">
+            {steamStatus.error.message}
+          </div>
         ) : (
           <Main />
         )

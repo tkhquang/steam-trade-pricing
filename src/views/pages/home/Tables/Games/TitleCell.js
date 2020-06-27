@@ -113,7 +113,7 @@ const TitleCell = ({
             <td className="border-none text-center w-6">
               {length ? (
                 <a
-                  href={`https://www.g2a.com${length ? details.slug : ""}`}
+                  href={`https://www.g2a.com${details?.data?.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className=""
