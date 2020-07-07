@@ -49,10 +49,10 @@ const TitleCell = ({
   };
 
   return (
-    <th>
+    <th style={{ minWidth: "250px" }}>
       <table className="border-none">
         <tbody>
-          <tr className="">
+          <tr>
             <td className="border-none block text-center w-6">
               {!status ? (
                 <span className="cursor-pointer" onClick={toggleExpand}>

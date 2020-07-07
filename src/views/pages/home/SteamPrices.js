@@ -9,10 +9,10 @@ const SteamPrices = () => {
   const { gems, csgoKey, tf2Key } = steamHelper.getPrices(steamPrices);
 
   return (
-    <div className="w-4/5 text-center flex mx-auto">
-      <div className="w-1/2">
+    <div className="w-4/5 text-center flex flex-wrap mx-auto">
+      <div className="flex-0 mx-auto">
         <h2>Current Price</h2>
-        <table className="mx-auto">
+        <table className="mx-auto table-auto">
           <thead>
             <tr>
               <th>Item</th>
@@ -29,9 +29,9 @@ const SteamPrices = () => {
           </tbody>
         </table>
       </div>
-      <div className="w-1/2">
+      <div className="flex-0 mx-auto">
         <h2>Conversion Rate</h2>
-        <table className="mx-auto">
+        <table className="mx-auto table-auto">
           <tbody>
             <tr>
               <td>

@@ -1,4 +1,6 @@
 # steam-trade-pricing
 Steam Trade Pricing
 
-Site is live at [steam-prices.netlify.com](https://steam-prices.netlify.com/) (WIP)
+Site is live at [steam-prices.netlify.app](https://steam-prices.netlify.app/) (WIP)
+
+## TODO: Add markdown table generator
